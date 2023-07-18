@@ -15,12 +15,17 @@ export interface NotificationContextType {
 }
 
 export const NotificationContext = createContext<
-  NotificationContextType | undefined
->(undefined);
+  NotificationContextType
+>({
+  Notifications: [],
+  setNotifications: function (e: NotificationTypePayload[]): void {
+    throw new Error("Function not implemented.");
+  }
+});
 
 export default function Home({
-          notifications,
-        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+                  notifications,
+                }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [IsNotificationOn, setIsNotificationOn] = useState<boolean>(false);
   const [Notifications, setNotifications] =
     useState<NotificationTypePayload[]>(notifications);

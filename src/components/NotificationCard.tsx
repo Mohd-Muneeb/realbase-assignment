@@ -1,32 +1,51 @@
 import { type NotificationTypePayload } from "@prisma/client";
 import React, { useRef, useContext } from "react";
-import { NotificationContext } from "~/pages";
+import { NotificationContext, type NotificationContextType } from "~/pages";
 
 export const NotificationCard = () => {
   const MarkedAsReadRef = useRef<HTMLButtonElement>(null);
 
-  const { Notifications, setNotifications } = useContext(NotificationContext);
+  const { Notifications, setNotifications } =
+    useContext<NotificationContextType>(NotificationContext);
 
-  // const handleRead = async () => {
-  //   const updateUser = await prisma.notificationType.update({
-  //     where: {
-  //       id: Notification.scalars.id,
-  //     },
-  //     data: {
-  //       acknowledged: true,
-  //     },
-  //   });
-  //   return null;
-  // };
+  const handleRead = async (id: number) => {
 
-  // console.log(Notification.scalars.acknowledged);
+    await fetch("/api/acknowledged", {
+      method: "POST",
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        id: id,
+      }),
+    });
+
+    const updateNotifications = Notifications.map(
+      (elem: NotificationTypePayload) => {
+        if (elem.scalars.id === id) {
+          return {
+            ...elem,
+            scalars: {
+              ...elem.scalars,
+              acknowledged: true,
+            },
+          };
+        }
+        return elem;
+      }
+    );
+
+    setNotifications(updateNotifications);
+
+    return;
+  };
 
   return (
     <div className="">
       {Notifications.map((Notification: NotificationTypePayload) => {
         return (
-          <>
-            <div className="flex w-[20rem] items-start justify-between gap-2">
+          <div key={Notification.scalars.id}>
+            <div  className="flex w-[20rem] items-start justify-between gap-2">
               {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -55,7 +74,8 @@ export const NotificationCard = () => {
                       <span className="text-gray-400">&nbsp;| &nbsp;</span>
                       <button
                         ref={MarkedAsReadRef}
-                        // onClick={() => handleRead()}
+                        // eslint-disable-next-line @typescript-eslint/no-misused-promises
+                        onClick={() => handleRead(Notification.scalars.id)}
                         className="text-sm text-amber-500 hover:underline"
                       >
                         Mark as Read
@@ -68,8 +88,8 @@ export const NotificationCard = () => {
               </div>
             </div>
             <hr className="border-1 my-2 border-dashed" />
-          </>
-        )
+          </div>
+        );
       })}
     </div>
   );
