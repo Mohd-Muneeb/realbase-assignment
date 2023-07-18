@@ -1,6 +1,5 @@
 import React from "react";
 import { NotificationCard } from "./NotificationCard";
-import { type NotificationTypePayload } from "@prisma/client";
 
 function NotificationSection() {
   return (

@@ -1,6 +1,6 @@
 import Head from "next/head";
 import NotificationsIcon from "@mui/icons-material/Notifications";
-import { useState, createContext } from "react";
+import { useState, useEffect, createContext } from "react";
 import NotificationSection from "~/components/NotificationSection";
 import { type InferGetServerSidePropsType } from "next";
 import { prisma } from "~/server/db";
@@ -14,21 +14,32 @@ export interface NotificationContextType {
   setNotifications: (e: NotificationTypePayload[]) => void;
 }
 
-export const NotificationContext = createContext<
-  NotificationContextType
->({
+export const NotificationContext = createContext<NotificationContextType>({
   Notifications: [],
   setNotifications: function (e: NotificationTypePayload[]): void {
     throw new Error("Function not implemented.");
-  }
+  },
 });
 
 export default function Home({
-                  notifications,
-                }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+                                          notifications,
+                                        }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [IsNotificationOn, setIsNotificationOn] = useState<boolean>(false);
   const [Notifications, setNotifications] =
     useState<NotificationTypePayload[]>(notifications);
+  const [CountOfActiveNotifications, setCountOfActiveNotifications] =
+    useState(0);
+
+  useEffect(() => {
+    setCountOfActiveNotifications(0);
+
+    Notifications.forEach((elem) =>
+      (elem.scalars.acknowledged)
+        ? setCountOfActiveNotifications(CountOfActiveNotifications + 1)
+        : null
+    );
+
+  }, [Notifications]);
 
   return (
     <>
@@ -44,26 +55,25 @@ export default function Home({
               onClick={() => setIsNotificationOn(!IsNotificationOn)}
               className={
                 IsNotificationOn
-                  ? "group rounded-xl border-[2px] border-solid border-[#02b7e2]  bg-[#02b7e2] px-3 py-2 transition ease-in"
-                  : "group rounded-xl border-[2px] border-solid px-3  py-2 transition ease-in hover:border-[#02b7e2] hover:bg-[#02b7e2]"
+                  ? "group relative rounded-xl border-[2px] border-solid border-[#02b7e2]  bg-[#02b7e2] px-3 py-2 transition ease-in"
+                  : "group relative rounded-xl border-[2px] border-solid px-3  py-2 transition ease-in hover:border-[#02b7e2] hover:bg-[#02b7e2]"
               }
             >
+              <div className="absolute right-0 top-0 z-10 flex max-h-4 w-4 items-center justify-center rounded-full bg-blue-300 p-2   text-sm">
+                {CountOfActiveNotifications}
+              </div>
               <NotificationsIcon
                 fontSize="medium"
                 className={
                   !IsNotificationOn
-                    ? "text-[black]  transition ease-in group-hover:text-white"
-                    : "text-white transition ease-in"
+                    ? "z-10 text-[black] transition ease-in group-hover:text-white"
+                    : "z-10 text-white transition ease-in"
                 }
               />
             </button>
           </nav>
           <div className="relative w-full">
-            {IsNotificationOn ? (
-              <NotificationSection />
-            ) : (
-              <></>
-            )}
+            {IsNotificationOn ? <NotificationSection /> : <></>}
           </div>
         </main>
       </NotificationContext.Provider>
