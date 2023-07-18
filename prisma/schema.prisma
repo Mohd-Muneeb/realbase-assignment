@@ -1,0 +1,50 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = "postgresql://postgres:kumudhinigupta123@db.ljhgueqtrvgaoovcfpvk.supabase.co:5432/postgres"
+}
+
+model User {
+  id               Int                @id @unique @db.SmallInt
+  email            String
+  deleted          Boolean
+  first_name       String
+  full_name        String
+  image_id         Int?               @db.SmallInt
+  last_name        String
+  sign_in_count    Int                @db.SmallInt
+  username         String
+  NotificationType NotificationType[]
+  image            Image?             @relation(fields: [image_id], references: [id], onDelete: NoAction, onUpdate: NoAction)
+}
+
+model Image {
+  id             Int     @id @unique @db.SmallInt
+  user_id        Int     @db.SmallInt
+  imageable_id   Int     @db.SmallInt
+  imageable_type String
+  image_type     String
+  private        Boolean
+  size           Int     @db.SmallInt
+  original_url   String
+  large_url      String
+  thumb_url      String
+  square_url     String
+  User           User[]
+}
+
+model NotificationType {
+  id           Int      @unique @id @db.SmallInt
+  artwork_id   Int      @db.SmallInt
+  user_id      Int
+  body         String
+  acknowledged Boolean
+  dates        DateTime
+  userId       Int      @db.SmallInt
+  user         User     @relation(fields: [userId], references: [id], onUpdate: NoAction)
+
+  // @@id([artwork_id, id])
+}
