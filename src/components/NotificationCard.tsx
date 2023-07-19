@@ -1,5 +1,6 @@
 import { type NotificationTypePayload } from "@prisma/client";
 import React, { useRef, useContext } from "react";
+import convertTime from "~/functions";
 import { NotificationContext, type NotificationContextType } from "~/pages";
 
 export const NotificationCard = () => {
@@ -9,11 +10,10 @@ export const NotificationCard = () => {
     useContext<NotificationContextType>(NotificationContext);
 
   const handleRead = async (id: number) => {
-
     await fetch("/api/acknowledged", {
       method: "POST",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
       body: JSON.stringify({
         id: id,
@@ -43,9 +43,12 @@ export const NotificationCard = () => {
   return (
     <div className="">
       {Notifications.map((Notification: NotificationTypePayload) => {
+        const date = Notification.scalars.dates as unknown;
+        const str = date as string;
+
         return (
           <div key={Notification.scalars.id}>
-            <div  className="flex w-[20rem] items-start justify-between gap-2">
+            <div className="flex w-[20rem] items-start justify-between gap-2">
               {
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -66,8 +69,9 @@ export const NotificationCard = () => {
                 </p>
                 <div className="flex items-center">
                   <p className="flex text-sm text-gray-400">
-                    {/* {convertTime(Notification.dates.created.date_time)} */}9
-                    minutes ago
+                    {convertTime(str)}
+                    {/* 9
+                    minutes ago */}
                   </p>
                   {!Notification.scalars.acknowledged ? (
                     <>

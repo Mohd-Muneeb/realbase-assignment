@@ -22,8 +22,8 @@ export const NotificationContext = createContext<NotificationContextType>({
 });
 
 export default function Home({
-                                                  notifications,
-                                                }: InferGetServerSidePropsType<typeof getServerSideProps>) {
+      notifications,
+    }: InferGetServerSidePropsType<typeof getServerSideProps>) {
   const [IsNotificationOn, setIsNotificationOn] = useState<boolean>(false);
   const [Notifications, setNotifications] =
     useState<NotificationTypePayload[]>(notifications);
@@ -34,11 +34,10 @@ export default function Home({
     setCountOfActiveNotifications(0);
 
     Notifications.forEach((elem) =>
-      !(elem.scalars.acknowledged)
-        ? setCountOfActiveNotifications(prev => prev + 1)
+      !elem.scalars.acknowledged
+        ? setCountOfActiveNotifications((prev) => prev + 1)
         : null
     );
-
   }, [Notifications]);
 
   return (
@@ -59,7 +58,7 @@ export default function Home({
                   : "group relative rounded-xl border-[2px] border-solid px-3  py-2 transition ease-in hover:border-[#02b7e2] hover:bg-[#02b7e2]"
               }
             >
-              <div className="absolute right-0 top-0 z-10 flex max-h-4 w-4 items-center justify-center rounded-full bg-blue-500 text-white p-2   text-sm">
+              <div className="absolute right-0 top-0 z-10 flex max-h-4 w-4 items-center justify-center rounded-full bg-blue-500 p-2 text-sm   text-white">
                 {CountOfActiveNotifications}
               </div>
               <NotificationsIcon
